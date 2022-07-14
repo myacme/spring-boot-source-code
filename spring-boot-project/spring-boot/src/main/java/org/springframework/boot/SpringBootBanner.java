@@ -25,6 +25,8 @@ import org.springframework.core.env.Environment;
 
 /**
  * Default Banner implementation which writes the 'Spring' banner.
+ * <p>
+ * 打印Springlog
  *
  * @author Phillip Webb
  */

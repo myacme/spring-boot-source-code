@@ -169,6 +169,12 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 				: new ArrayList<>();
 	}
 
+	/**
+	 * 获取web应用对象
+	 * @param initializers {@link ServletContextInitializer}s that should be applied as
+	 * the server starts
+	 * @return
+	 */
 	@Override
 	public WebServer getWebServer(ServletContextInitializer... initializers) {
 		if (this.disableMBeanRegistry) {
@@ -179,14 +185,17 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 		tomcat.setBaseDir(baseDir.getAbsolutePath());
 		Connector connector = new Connector(this.protocol);
 		connector.setThrowOnFailure(true);
+		//添加连接器
 		tomcat.getService().addConnector(connector);
 		customizeConnector(connector);
 		tomcat.setConnector(connector);
 		tomcat.getHost().setAutoDeploy(false);
+		//配置Tomcat引擎
 		configureEngine(tomcat.getEngine());
 		for (Connector additionalConnector : this.additionalTomcatConnectors) {
 			tomcat.getService().addConnector(additionalConnector);
 		}
+		//准备上下文
 		prepareContext(tomcat.getHost(), initializers);
 		return getTomcatWebServer(tomcat);
 	}
@@ -194,12 +203,14 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 	private void configureEngine(Engine engine) {
 		engine.setBackgroundProcessorDelay(this.backgroundProcessorDelay);
 		for (Valve valve : this.engineValves) {
+			//管道设置引擎
 			engine.getPipeline().addValve(valve);
 		}
 	}
 
 	protected void prepareContext(Host host, ServletContextInitializer[] initializers) {
 		File documentRoot = getValidDocumentRoot();
+		//设置应用上下文
 		TomcatEmbeddedContext context = new TomcatEmbeddedContext();
 		if (documentRoot != null) {
 			context.setResources(new LoaderHidingResourceRoot(context));
@@ -236,7 +247,9 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 		context.addLifecycleListener(new StaticResourceConfigurer(context));
 		ServletContextInitializer[] initializersToUse = mergeInitializers(initializers);
 		host.addChild(context);
+		//配置应用上下文
 		configureContext(context, initializersToUse);
+		//后置处理器
 		postProcessContext(context);
 	}
 
@@ -344,6 +357,9 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 
 	/**
 	 * Configure the Tomcat {@link Context}.
+	 *
+	 * 配置Tomcat上下文。
+	 *
 	 * @param context the Tomcat context
 	 * @param initializers initializers to apply
 	 */
@@ -356,11 +372,14 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 		}
 		context.addServletContainerInitializer(starter, NO_CLASSES);
 		for (LifecycleListener lifecycleListener : this.contextLifecycleListeners) {
+			//增加监听器
 			context.addLifecycleListener(lifecycleListener);
 		}
 		for (Valve valve : this.contextValves) {
+			//应用绑定通道
 			context.getPipeline().addValve(valve);
 		}
+		//错误页面
 		for (ErrorPage errorPage : getErrorPages()) {
 			org.apache.tomcat.util.descriptor.web.ErrorPage tomcatErrorPage = new org.apache.tomcat.util.descriptor.web.ErrorPage();
 			tomcatErrorPage.setLocation(errorPage.getPath());
@@ -371,6 +390,7 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 		for (MimeMappings.Mapping mapping : getMimeMappings()) {
 			context.addMimeMapping(mapping.getExtension(), mapping.getMimeType());
 		}
+		//配置session
 		configureSession(context);
 		new DisableReferenceClearingContextCustomizer().customize(context);
 		for (TomcatContextCustomizer customizer : this.tomcatContextCustomizers) {
@@ -378,6 +398,10 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 		}
 	}
 
+	/**
+	 * 配置session
+	 * @param context
+	 */
 	private void configureSession(Context context) {
 		long sessionTimeout = getSessionTimeoutInMinutes();
 		context.setSessionTimeout((int) sessionTimeout);
@@ -391,6 +415,7 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 				manager = new StandardManager();
 				context.setManager(manager);
 			}
+			//配置持久会话
 			configurePersistSession(manager);
 		}
 		else {

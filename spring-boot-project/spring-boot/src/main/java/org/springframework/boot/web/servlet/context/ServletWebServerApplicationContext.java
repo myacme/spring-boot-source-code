@@ -150,6 +150,7 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 	protected void onRefresh() {
 		super.onRefresh();
 		try {
+			//创建tomcat
 			createWebServer();
 		}
 		catch (Throwable ex) {
@@ -174,9 +175,12 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 
 	private void createWebServer() {
 		WebServer webServer = this.webServer;
+		//获取servlet上下文
 		ServletContext servletContext = getServletContext();
 		if (webServer == null && servletContext == null) {
+			//web工厂
 			ServletWebServerFactory factory = getWebServerFactory();
+			//获取webServer
 			this.webServer = factory.getWebServer(getSelfInitializer());
 		}
 		else if (servletContext != null) {
@@ -213,6 +217,9 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 	/**
 	 * Returns the {@link ServletContextInitializer} that will be used to complete the
 	 * setup of this {@link WebApplicationContext}.
+	 *
+	 * 返回用于完成此WebApplicationContext设置的ServletContextInitializer
+	 *
 	 * @return the self initializer
 	 * @see #prepareWebApplicationContext(ServletContext)
 	 */

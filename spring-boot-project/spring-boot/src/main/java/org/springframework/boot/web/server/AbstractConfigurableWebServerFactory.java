@@ -164,6 +164,9 @@ public abstract class AbstractConfigurableWebServerFactory implements Configurab
 
 	/**
 	 * Return the absolute temp dir for given web server.
+	 *
+	 * 返回给定web服务器的绝对临时目录
+	 *
 	 * @param prefix server name
 	 * @return the temp dir for given server.
 	 */

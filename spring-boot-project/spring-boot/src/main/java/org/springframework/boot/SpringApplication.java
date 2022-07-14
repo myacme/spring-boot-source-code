@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -330,9 +332,9 @@ public class SpringApplication {
 			//实例化上下文
 			exceptionReporters = getSpringFactoriesInstances(SpringBootExceptionReporter.class,
 					new Class[] { ConfigurableApplicationContext.class }, context);
-			//准备上下文
+			//准备上下文 向上下文中设置属性值
 			prepareContext(context, environment, listeners, applicationArguments, printedBanner);
-			//刷新上下文
+			//刷新上下文  调用spring的refresh
 			refreshContext(context);
 			//后置刷新
 			afterRefresh(context, applicationArguments);
@@ -387,9 +389,11 @@ public class SpringApplication {
 
 	private void prepareContext(ConfigurableApplicationContext context, ConfigurableEnvironment environment,
 			SpringApplicationRunListeners listeners, ApplicationArguments applicationArguments, Banner printedBanner) {
-		//
+		//设置环境
 		context.setEnvironment(environment);
+		//在ApplicationContext中应用任何相关的后处理。子类可以根据需要应用其他处理。
 		postProcessApplicationContext(context);
+		//应用初始值设定项
 		applyInitializers(context);
 		listeners.contextPrepared(context);
 		if (this.logStartupInfo) {
@@ -412,6 +416,7 @@ public class SpringApplication {
 		// Load the sources
 		Set<Object> sources = getAllSources();
 		Assert.notEmpty(sources, "Sources must not be empty");
+		//加载主类，并把主类放到容器中
 		load(context, sources.toArray(new Object[0]));
 		listeners.contextLoaded(context);
 	}
@@ -617,6 +622,9 @@ public class SpringApplication {
 	/**
 	 * Apply any relevant post processing the {@link ApplicationContext}. Subclasses can
 	 * apply additional processing as required.
+	 * <p>
+	 * 在ApplicationContext中应用任何相关的后处理。子类可以根据需要应用其他处理。
+	 *
 	 * @param context the application context
 	 */
 	protected void postProcessApplicationContext(ConfigurableApplicationContext context) {
@@ -697,6 +705,9 @@ public class SpringApplication {
 
 	/**
 	 * Load beans into the application context.
+	 * <p>
+	 * 将bean加载到应用程序上下文中
+	 *
 	 * @param context the context to load beans into
 	 * @param sources the sources to load
 	 */
@@ -714,6 +725,7 @@ public class SpringApplication {
 		if (this.environment != null) {
 			loader.setEnvironment(this.environment);
 		}
+
 		loader.load();
 	}
 

@@ -46,6 +46,8 @@ import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.util.Assert;
 
 /**
+ * 管理上下文的自动配置
+ *
  * {@link EnableAutoConfiguration Auto-configuration} for the management context. If the
  * {@code management.server.port} is the same as the {@code server.port} the management
  * context will be the same as the main application context. If the

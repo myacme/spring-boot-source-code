@@ -125,6 +125,7 @@ class BeanDefinitionLoader {
 	int load() {
 		int count = 0;
 		for (Object source : this.sources) {
+
 			count += load(source);
 		}
 		return count;
@@ -153,6 +154,7 @@ class BeanDefinitionLoader {
 			GroovyBeanDefinitionSource loader = BeanUtils.instantiateClass(source, GroovyBeanDefinitionSource.class);
 			load(loader);
 		}
+		//判断是否是compent组件
 		if (isComponent(source)) {
 			this.annotatedReader.register(source);
 			return 1;
