@@ -335,6 +335,7 @@ public class SpringApplication {
 			//准备上下文 向上下文中设置属性值
 			prepareContext(context, environment, listeners, applicationArguments, printedBanner);
 			//刷新上下文  调用spring的refresh
+			// 重写AbstractApplicationContext.onRefresh() 创建tomcat
 			refreshContext(context);
 			//后置刷新
 			afterRefresh(context, applicationArguments);
