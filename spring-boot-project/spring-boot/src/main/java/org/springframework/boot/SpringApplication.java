@@ -344,6 +344,7 @@ public class SpringApplication {
 				new StartupInfoLogger(this.mainApplicationClass).logStarted(getApplicationLog(), stopWatch);
 			}
 			listeners.started(context);
+			//执行自定义的启动器
 			callRunners(context, applicationArguments);
 		}
 		catch (Throwable ex) {
